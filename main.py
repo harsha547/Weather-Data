@@ -7,7 +7,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from openpyxl import Workbook, load_workbook
-import sys
+
 
 def get_html(airport_code, airport_path, month, file_path):
     url = BASE_URL.format(airport_code, month)
@@ -39,7 +39,7 @@ def export_data(airport_code, row, file_path, month):
     coordinates = SHEET_DATA['J'+str(row)].value
     soup = BeautifulSoup(open(file_path), 'lxml')
     table = soup.find_all("table", "days ng-star-inserted")[0]
-    reset = globals()['OUTPUT_START_ROW']-1
+    reset = globals()['OUTPUT_START_ROW']
     print(reset, month, globals()['OUTPUT_START_ROW'])
     inbound_row = 1
     for index, table_content in enumerate(table.select("table > tbody > tr > td"), 1):
@@ -50,86 +50,70 @@ def export_data(airport_code, row, file_path, month):
                 if data_loc > 1:
                     SHEET_OUTPUT['A' + str(OUTPUT_START_ROW)].value = iata_code
                     SHEET_OUTPUT['B' + str(OUTPUT_START_ROW)].value = airport_code
-                    SHEET_OUTPUT['C' + str(OUTPUT_START_ROW)].value = type
-                    SHEET_OUTPUT['D' + str(OUTPUT_START_ROW)].value = name
-                    SHEET_OUTPUT['E' + str(OUTPUT_START_ROW)].value = elevation_ft
-                    SHEET_OUTPUT['F' + str(OUTPUT_START_ROW)].value = continent
-                    SHEET_OUTPUT['G' + str(OUTPUT_START_ROW)].value = iso_country
-                    SHEET_OUTPUT['H' + str(OUTPUT_START_ROW)].value = iso_region
-                    SHEET_OUTPUT['I' + str(OUTPUT_START_ROW)].value = coordinates
-                    SHEET_OUTPUT['J' + str(OUTPUT_START_ROW)].value = datetime.date(2020, month, int(table_data.get_text()))
+                    SHEET_OUTPUT['C' + str(OUTPUT_START_ROW)].value = elevation_ft
+                    SHEET_OUTPUT['D' + str(OUTPUT_START_ROW)].value = continent
+                    SHEET_OUTPUT['E' + str(OUTPUT_START_ROW)].value = iso_country
+                    SHEET_OUTPUT['F' + str(OUTPUT_START_ROW)].value = iso_region
+                    SHEET_OUTPUT['G' + str(OUTPUT_START_ROW)].value = coordinates
+                    SHEET_OUTPUT['H' + str(OUTPUT_START_ROW)].value = datetime.date(2020, month, int(table_data.get_text()))
                     globals()['OUTPUT_START_ROW'] += 1
             elif index == 2:
                 # Temperature (° F)
                 if data_loc > 3:
                     if inbound_row == 1:
-                        SHEET_OUTPUT['K' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
+                        SHEET_OUTPUT['I' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
                         inbound_row += 1
                     elif inbound_row == 2:
-                        SHEET_OUTPUT['L' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
+                        SHEET_OUTPUT['J' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
                         inbound_row += 1
                     elif inbound_row == 3:
-                        SHEET_OUTPUT['M' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
+                        SHEET_OUTPUT['K' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
                         globals()['OUTPUT_START_ROW'] += 1
                         inbound_row = 1
             elif index == 3:
-                # Dew Point (° F)
+                # Humidity (%)
                 if data_loc > 3:
                     if inbound_row == 1:
-                        SHEET_OUTPUT['N' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
+                        #SHEET_OUTPUT['L' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
                         inbound_row += 1
                     elif inbound_row == 2:
-                        SHEET_OUTPUT['O' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
+                        #SHEET_OUTPUT['M' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
                         inbound_row += 1
                     elif inbound_row == 3:
-                        SHEET_OUTPUT['P' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
+                        #SHEET_OUTPUT['N' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
                         globals()['OUTPUT_START_ROW'] += 1
                         inbound_row = 1
             elif index == 4:
                 # Humidity (%)
                 if data_loc > 3:
                     if inbound_row == 1:
-                        SHEET_OUTPUT['Q' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
+                        SHEET_OUTPUT['L' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
                         inbound_row += 1
                     elif inbound_row == 2:
-                        SHEET_OUTPUT['R' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
+                        SHEET_OUTPUT['M' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
                         inbound_row += 1
                     elif inbound_row == 3:
-                        SHEET_OUTPUT['S' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
+                        SHEET_OUTPUT['N' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
                         globals()['OUTPUT_START_ROW'] += 1
                         inbound_row = 1
-            elif index == 5:
-                # Wind Speed (mph)
+            elif index == 5 or index == 6:
+                # Humidity (%)
                 if data_loc > 3:
                     if inbound_row == 1:
-                        SHEET_OUTPUT['T' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
+                        #SHEET_OUTPUT['L' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
                         inbound_row += 1
                     elif inbound_row == 2:
-                        SHEET_OUTPUT['U' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
+                        #SHEET_OUTPUT['M' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
                         inbound_row += 1
                     elif inbound_row == 3:
-                        SHEET_OUTPUT['V' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
-                        globals()['OUTPUT_START_ROW'] += 1
-                        inbound_row = 1
-            elif index == 6:
-                # Pressure (Hg)
-                if data_loc > 3:
-                    if inbound_row == 1:
-                        SHEET_OUTPUT['W' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
-                        inbound_row += 1
-                    elif inbound_row == 2:
-                        SHEET_OUTPUT['X' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
-                        inbound_row += 1
-                    elif inbound_row == 3:
-                        SHEET_OUTPUT['Y' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
+                        #SHEET_OUTPUT['N' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
                         globals()['OUTPUT_START_ROW'] += 1
                         inbound_row = 1
             elif index == 7:
                 # Precipitation (in)
                 if data_loc > 1:
-                        SHEET_OUTPUT['Z' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
-                        globals()['OUTPUT_START_ROW'] += 1
-
+                    SHEET_OUTPUT['Z' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
+                    globals()['OUTPUT_START_ROW'] += 1
 
 if __name__ == "__main__":
     global BROWSER
@@ -149,7 +133,7 @@ if __name__ == "__main__":
     chrome_driver = os.path.join(driver_path, "chromedriver")
     BROWSER = webdriver.Chrome(options=chrome_options, executable_path=chrome_driver)
     start_row = 2
-    end_row = 2
+    end_row = 3
     iata_data = load_workbook(os.path.join(os.getcwd(), "IATA.xlsx"))
     SHEET_DATA = iata_data["IATA"]
     output_path = os.path.join(os.path.join(os.getcwd(), 'Output'), '{}_{}.xlsx'.format(start_row, end_row))
