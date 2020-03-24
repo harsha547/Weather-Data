@@ -14,11 +14,15 @@ def get_html(airport_code, airport_path, month, file_path):
     # Early exist - already file download
     if os.path.exists(file_path):
         return 1
-    if not os.path.exists(airport_path):
+    if  os.path.exists(airport_path):
+        # File's not available in wunderground
+        return 0
+    else:
         os.makedirs(airport_path)
-    BROWSER.get(url)
+
     try:
-        WebDriverWait(BROWSER, 100).until(EC.presence_of_element_located((By.XPATH, XPATH)))
+        BROWSER.get(url)
+        WebDriverWait(BROWSER, 60).until(EC.presence_of_element_located((By.XPATH, XPATH)))
     except:
         print("Not availiable for {}".format(airport_code))
         return 0
@@ -40,7 +44,6 @@ def export_data(airport_code, row, file_path, month):
     soup = BeautifulSoup(open(file_path), 'lxml')
     table = soup.find_all("table", "days ng-star-inserted")[0]
     reset = globals()['OUTPUT_START_ROW']
-    print(reset, month, globals()['OUTPUT_START_ROW'])
     inbound_row = 1
     for index, table_content in enumerate(table.select("table > tbody > tr > td"), 1):
         globals()['OUTPUT_START_ROW'] = reset
@@ -112,8 +115,9 @@ def export_data(airport_code, row, file_path, month):
             elif index == 7:
                 # Precipitation (in)
                 if data_loc > 1:
-                    SHEET_OUTPUT['Z' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
+                    #SHEET_OUTPUT['Z' + str(OUTPUT_START_ROW)].value = float(table_data.get_text())
                     globals()['OUTPUT_START_ROW'] += 1
+
 
 if __name__ == "__main__":
     global BROWSER
@@ -132,8 +136,8 @@ if __name__ == "__main__":
     driver_path = os.path.join(os.getcwd(), "Driver")
     chrome_driver = os.path.join(driver_path, "chromedriver")
     BROWSER = webdriver.Chrome(options=chrome_options, executable_path=chrome_driver)
-    start_row = 2
-    end_row = 3
+    start_row = 1001
+    end_row = 2000
     iata_data = load_workbook(os.path.join(os.getcwd(), "IATA.xlsx"))
     SHEET_DATA = iata_data["IATA"]
     output_path = os.path.join(os.path.join(os.getcwd(), 'Output'), '{}_{}.xlsx'.format(start_row, end_row))
